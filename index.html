@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCALE 9-Year NRS MSG Summary Dashboard</title>
+    <title>SCALE 10-Year NRS MSG Summary Dashboard</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -14,7 +14,7 @@
         }
         .container {
             max-width: 1000px;
-            margin: 0 auto;
+            margin: 0 auto 1.5rem auto;
             background: white;
             padding: 2rem;
             border-radius: 12px;
@@ -22,6 +22,11 @@
         }
         h1 {
             font-size: 24px;
+            margin-bottom: 0.5rem;
+            color: #222;
+        }
+        h2 {
+            font-size: 20px;
             margin-bottom: 0.5rem;
             color: #222;
         }
@@ -48,7 +53,7 @@
             margin-bottom: 0.5rem;
             color: #555;
         }
-        select, input {
+        select {
             width: 100%;
             padding: 10px 12px;
             font-size: 14px;
@@ -58,15 +63,12 @@
             color: #333;
             font-family: inherit;
         }
-        select:focus, input:focus {
+        select:focus, button:focus-visible {
             outline: none;
             border-color: #378ADD;
             box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.1);
         }
-        .button-group {
-            display: flex;
-            gap: 8px;
-        }
+        .button-group { display: flex; gap: 8px; }
         button {
             padding: 10px 16px;
             font-size: 14px;
@@ -77,11 +79,9 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.2s;
+            font-family: inherit;
         }
-        button:hover {
-            border-color: #999;
-            background: #f9f9f9;
-        }
+        button:hover { border-color: #999; background: #f9f9f9; }
         button.active {
             border-color: #378ADD;
             background: #E6F1FB;
@@ -93,11 +93,7 @@
             background: #fafafa;
             border-radius: 8px;
         }
-        svg {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+        svg { width: 100%; height: auto; display: block; }
         .info-box {
             background: #f0f4f8;
             border-left: 4px solid #378ADD;
@@ -107,38 +103,54 @@
             font-size: 13px;
             color: #555;
         }
-        .info-box strong {
-            color: #333;
-            display: block;
-            margin-bottom: 4px;
+        .info-box strong { color: #333; display: block; margin-bottom: 4px; }
+
+        /* Program completions */
+        .completions { margin-top: 1.5rem; }
+        .bar-row {
+            display: grid;
+            grid-template-columns: 210px 1fr 48px;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
         }
+        .bar-label { font-size: 13px; color: #444; }
+        .bar-track { background: #eef2f6; border-radius: 4px; height: 22px; }
+        .bar-fill {
+            background: #378ADD;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        .bar-value { font-size: 13px; font-weight: 600; color: #0C447C; text-align: right; }
+        .total-line {
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e5e5;
+            font-size: 14px;
+            color: #333;
+        }
+        .total-line strong { color: #0C447C; }
+
         @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-            }
-            .control-group {
-                width: 100%;
-            }
-            body {
-                padding: 1rem;
-            }
-            .container {
-                padding: 1rem;
-            }
-            h1 {
-                font-size: 20px;
-            }
+            .controls { flex-direction: column; }
+            .control-group { width: 100%; }
+            body { padding: 1rem; }
+            .container { padding: 1rem; }
+            h1 { font-size: 20px; }
+            .bar-row { grid-template-columns: 130px 1fr 40px; gap: 8px; }
+            .bar-label { font-size: 12px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>SCALE 9-Year NRS MSG Summary</h1>
-        <p class="subtitle">Program trends FY 16-17 through FY 24-25</p>
-        
+        <h1>SCALE 10-Year NRS MSG Summary</h1>
+        <p class="subtitle">Program trends FY 16-17 through FY 25-26</p>
+
         <div class="controls">
             <div class="control-group">
-                <label>Select metric:</label>
+                <label for="metricSelect">Select metric:</label>
                 <select id="metricSelect">
                     <optgroup label="ESL">
                         <option value="esl_participants">ESL Participants</option>
@@ -161,39 +173,57 @@
                     </optgroup>
                 </select>
             </div>
-            
-            <div class="button-group">
-                <button id="lineBtn" class="active">Trend line</button>
-                <button id="barBtn">Bar chart</button>
+            <div class="control-group" style="flex:0 0 auto;">
+                <label>Chart type:</label>
+                <div class="button-group">
+                    <button id="lineBtn" class="active">Trend line</button>
+                    <button id="barBtn">Bar chart</button>
+                </div>
             </div>
         </div>
 
         <div class="chart-container">
-            <svg id="chart" viewBox="0 0 900 380" style="min-height: 350px;"></svg>
+            <svg id="chart" viewBox="0 0 900 450" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
 
         <div class="info-box">
             <strong id="metricLabel">ESL Participants</strong>
-            <p>9-year trend showing annual progress from FY 16-17 through FY 24-25. Hover over data points for exact values.</p>
+            <p>10-year trend showing annual progress from FY 16-17 through FY 25-26. Hover over data points for exact values.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>FY 25-26 Program Completions</h2>
+        <p class="subtitle">Credentials and program graduates by pathway</p>
+
+        <div class="completions" id="completions"></div>
+
+        <div class="total-line">
+            Total completions across all pathways: <strong>154</strong>
+        </div>
+
+        <div class="info-box">
+            <strong>How this relates to NRS Table 4</strong>
+            <p>Program completions count every learner who finished a pathway. NRS Table 4 counts only secondary credentials attained within a participant's period of participation, which is why Table 4 reports 45 rather than the 67 combined adult diploma and HSE graduates.</p>
         </div>
     </div>
 
     <script>
         const data = {
-            years: ['16-17', '17-18', '18-19', '19-20', '20-21', '21-22', '22-23', '23-24', '24-25'],
-            esl_participants: [322, 287, 290, 277, 215, 106, 209, 254, 322],
-            esl_hours: [27922, 35118, 50644, 35544, 27286, 8796, 22493, 23331, 32012],
-            esl_gains: [159, 153, 106, 49, 58, 1, 58, 116, 195],
-            esl_msg: [49.38, 53.31, 36.55, 17.69, 26.98, 0.94, 27.75, 45.67, 60.56],
-            abe_participants: [94, 91, 101, 148, 136, 88, 128, 178, 237],
-            abe_hours: [7114, 9286, 17030, 17338, 16054, 7888, 12174, 20435, 27731],
-            abe_gains: [16, 19, 35, 25, 31, 17, 36, 90, 135],
-            abe_msg: [17.02, 20.88, 34.65, 16.89, 22.79, 19.32, 28.13, 50.56, 56.96],
-            abe_diplomas: [2, 3, 8, 6, 12, 7, 15, 22, 35],
-            grand_participants: [416, 378, 391, 425, 351, 194, 337, 432, 559],
-            grand_hours: [35036, 44404, 67674, 52882, 43340, 16684, 34667, 43766, 59742],
-            grand_gains: [175, 172, 141, 74, 89, 18, 94, 206, 330],
-            grand_msg: [42.07, 45.5, 36.06, 17.41, 25.35, 9.28, 27.89, 47.69, 59.03]
+            years: ['16-17', '17-18', '18-19', '19-20', '20-21', '21-22', '22-23', '23-24', '24-25', '25-26'],
+            esl_participants: [322, 287, 290, 277, 215, 106, 209, 254, 322, 294],
+            esl_hours: [27922, 35118, 50644, 35544, 27286, 8796, 22493, 23331, 32012, 34346],
+            esl_gains: [159, 153, 106, 49, 58, 1, 58, 116, 195, 215],
+            esl_msg: [49.38, 53.31, 36.55, 17.69, 26.98, 0.94, 27.75, 45.67, 60.56, 73.13],
+            abe_participants: [94, 91, 101, 148, 136, 88, 128, 178, 237, 279],
+            abe_hours: [7114, 9286, 17030, 17338, 16054, 7888, 12174, 20435, 27731, 28578],
+            abe_gains: [16, 19, 35, 25, 31, 17, 36, 90, 135, 160],
+            abe_msg: [17.02, 20.88, 34.65, 16.89, 22.79, 19.32, 28.13, 50.56, 56.96, 57.35],
+            abe_diplomas: [2, 3, 8, 6, 12, 7, 15, 22, 35, 45],
+            grand_participants: [416, 378, 391, 425, 351, 194, 337, 432, 559, 573],
+            grand_hours: [35036, 44404, 67674, 52882, 43340, 16684, 34667, 43766, 59742, 62924],
+            grand_gains: [175, 172, 141, 74, 89, 18, 94, 206, 330, 375],
+            grand_msg: [42.07, 45.5, 36.06, 17.41, 25.35, 9.28, 27.89, 47.69, 59.03, 65.45]
         };
 
         const labels = {
@@ -203,7 +233,7 @@
             esl_msg: 'ESL % MSG',
             abe_participants: 'ABE Participants',
             abe_hours: 'ABE Hours',
-            abe_gains: 'ABE # Gains (Gains + Diplomas)',
+            abe_gains: 'ABE # Gains',
             abe_msg: 'ABE % MSG',
             abe_diplomas: 'ABE # Diplomas',
             grand_participants: 'Grand Participants',
@@ -212,84 +242,75 @@
             grand_msg: 'Grand % MSG'
         };
 
+        const completions = [
+            { name: 'High School Equivalency', count: 54 },
+            { name: 'Paraeducator', count: 26 },
+            { name: 'CNA', count: 24 },
+            { name: 'Early Education', count: 14 },
+            { name: 'Adult Diploma', count: 13 },
+            { name: 'HVAC', count: 12 },
+            { name: 'Facilities Maintenance', count: 11 }
+        ];
+
         let currentMetric = 'esl_participants';
         let chartType = 'line';
 
         function drawChart() {
             const svg = document.getElementById('chart');
             svg.innerHTML = '';
-            
-            const values = data[currentMetric].filter(v => v !== null);
-            const min = Math.min(...values);
-            const max = Math.max(...values);
-            const range = max - min || 1;
-            
-            const width = 900;
-            const height = 380;
-            const padding = { top: 30, right: 30, bottom: 60, left: 70 };
+
+            const width = 900, height = 450;
+            const padding = { top: 30, right: 40, bottom: 60, left: 80 };
             const chartWidth = width - padding.left - padding.right;
             const chartHeight = height - padding.top - padding.bottom;
-            
+
+            const values = data[currentMetric].filter(v => v !== null);
+            const yMin = 0;
+            const yMax = Math.max(...values) * 1.12;
             const xStep = chartWidth / (data.years.length - 1);
-            const yMin = Math.max(0, min - range * 0.1);
-            const yMax = max + range * 0.1;
-            
-            // Grid lines and Y labels
-            for (let i = 0; i <= 4; i++) {
-                const y = yMin + (yMax - yMin) * (i / 4);
+
+            function svgEl(tag, attrs) {
+                const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+                for (const k in attrs) el.setAttribute(k, attrs[k]);
+                return el;
+            }
+
+            // Horizontal grid lines + Y labels
+            for (let i = 0; i <= 5; i++) {
+                const y = yMin + (yMax - yMin) * i / 5;
                 const py = padding.top + chartHeight - (y - yMin) / (yMax - yMin) * chartHeight;
-                
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', padding.left);
-                line.setAttribute('y1', py);
-                line.setAttribute('x2', width - padding.right);
-                line.setAttribute('y2', py);
-                line.setAttribute('stroke', '#ddd');
-                line.setAttribute('stroke-width', '1');
-                svg.appendChild(line);
-                
-                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                label.setAttribute('x', padding.left - 10);
-                label.setAttribute('y', py + 4);
-                label.setAttribute('text-anchor', 'end');
-                label.setAttribute('font-size', '12');
-                label.setAttribute('fill', '#888');
+                svg.appendChild(svgEl('line', {
+                    x1: padding.left, y1: py, x2: width - padding.right, y2: py,
+                    stroke: '#e0e0e0', 'stroke-width': '1'
+                }));
+                const label = svgEl('text', {
+                    x: padding.left - 10, y: py + 4, 'text-anchor': 'end',
+                    'font-size': '12', fill: '#666'
+                });
                 label.textContent = Math.round(y).toLocaleString();
                 svg.appendChild(label);
             }
-            
+
             // X axis labels
             for (let i = 0; i < data.years.length; i++) {
                 const x = padding.left + i * xStep;
-                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                label.setAttribute('x', x);
-                label.setAttribute('y', height - 20);
-                label.setAttribute('text-anchor', 'middle');
-                label.setAttribute('font-size', '12');
-                label.setAttribute('fill', '#888');
+                const label = svgEl('text', {
+                    x: x, y: height - 25, 'text-anchor': 'middle',
+                    'font-size': '11', fill: '#666'
+                });
                 label.textContent = 'FY ' + data.years[i];
                 svg.appendChild(label);
             }
-            
-            // Axes
-            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            xAxis.setAttribute('x1', padding.left);
-            xAxis.setAttribute('y1', padding.top + chartHeight);
-            xAxis.setAttribute('x2', width - padding.right);
-            xAxis.setAttribute('y2', padding.top + chartHeight);
-            xAxis.setAttribute('stroke', '#333');
-            xAxis.setAttribute('stroke-width', '1');
-            svg.appendChild(xAxis);
-            
-            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            yAxis.setAttribute('x1', padding.left);
-            yAxis.setAttribute('y1', padding.top);
-            yAxis.setAttribute('x2', padding.left);
-            yAxis.setAttribute('y2', padding.top + chartHeight);
-            yAxis.setAttribute('stroke', '#333');
-            yAxis.setAttribute('stroke-width', '1');
-            svg.appendChild(yAxis);
-            
+
+            function showTooltip(x, y, val, id) {
+                const t = svgEl('text', {
+                    x: x, y: y - 12, 'text-anchor': 'middle', 'font-size': '13',
+                    fill: '#0C447C', 'font-weight': 'bold', 'pointer-events': 'none', id: id
+                });
+                t.textContent = (Math.round(val * 100) / 100).toLocaleString();
+                svg.appendChild(t);
+            }
+
             if (chartType === 'line') {
                 let pathData = 'M';
                 let first = true;
@@ -301,96 +322,67 @@
                     pathData += (first ? '' : ' L') + ' ' + x + ' ' + y;
                     first = false;
                 }
-                
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('d', pathData);
-                path.setAttribute('stroke', '#378ADD');
-                path.setAttribute('stroke-width', '3');
-                path.setAttribute('fill', 'none');
-                path.setAttribute('stroke-linecap', 'round');
-                path.setAttribute('stroke-linejoin', 'round');
-                svg.appendChild(path);
-                
-                // Draw points
+                svg.appendChild(svgEl('path', {
+                    d: pathData, stroke: '#378ADD', 'stroke-width': '2.5', fill: 'none'
+                }));
+
                 for (let i = 0; i < data[currentMetric].length; i++) {
                     const val = data[currentMetric][i];
                     if (val === null) continue;
                     const x = padding.left + i * xStep;
                     const y = padding.top + chartHeight - (val - yMin) / (yMax - yMin) * chartHeight;
-                    
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('cx', x);
-                    circle.setAttribute('cy', y);
-                    circle.setAttribute('r', '5');
-                    circle.setAttribute('fill', '#378ADD');
-                    circle.setAttribute('stroke', 'white');
-                    circle.setAttribute('stroke-width', '2');
+                    const circle = svgEl('circle', { cx: x, cy: y, r: '5', fill: '#378ADD' });
                     svg.appendChild(circle);
-                    
-                    // Tooltip on hover
-                    circle.addEventListener('mouseover', (e) => {
+                    circle.addEventListener('mouseover', () => {
                         circle.setAttribute('r', '7');
-                        const tooltip = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                        tooltip.setAttribute('x', x);
-                        tooltip.setAttribute('y', y - 15);
-                        tooltip.setAttribute('text-anchor', 'middle');
-                        tooltip.setAttribute('font-size', '12');
-                        tooltip.setAttribute('fill', '#333');
-                        tooltip.setAttribute('font-weight', 'bold');
-                        tooltip.setAttribute('pointer-events', 'none');
-                        tooltip.textContent = Math.round(val * 10) / 10;
-                        tooltip.id = 'tooltip-' + i;
-                        svg.appendChild(tooltip);
+                        showTooltip(x, y, val, 'tooltip-' + i);
                     });
-                    
                     circle.addEventListener('mouseout', () => {
                         circle.setAttribute('r', '5');
-                        const tooltip = document.getElementById('tooltip-' + i);
-                        if (tooltip) tooltip.remove();
+                        const t = document.getElementById('tooltip-' + i);
+                        if (t) t.remove();
                     });
                 }
             } else {
-                const barWidth = chartWidth / data.years.length * 0.5;
-                const spacing = (chartWidth - barWidth * data.years.length) / (data.years.length + 1);
-                
+                const n = data.years.length;
+                const barWidth = chartWidth / n * 0.6;
+                const spacing = (chartWidth - barWidth * n) / (n + 1);
+
                 for (let i = 0; i < data[currentMetric].length; i++) {
                     const val = data[currentMetric][i];
                     if (val === null) continue;
                     const x = padding.left + spacing + i * (barWidth + spacing);
                     const barHeight = (val - yMin) / (yMax - yMin) * chartHeight;
                     const y = padding.top + chartHeight - barHeight;
-                    
-                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    rect.setAttribute('x', x);
-                    rect.setAttribute('y', y);
-                    rect.setAttribute('width', barWidth);
-                    rect.setAttribute('height', barHeight);
-                    rect.setAttribute('fill', '#85B7EB');
-                    svg.appendChild(rect);
-                    
-                    // Tooltip on hover
-                    rect.addEventListener('mouseover', (e) => {
-                        rect.setAttribute('fill', '#378ADD');
-                        const tooltip = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                        tooltip.setAttribute('x', x + barWidth / 2);
-                        tooltip.setAttribute('y', y - 5);
-                        tooltip.setAttribute('text-anchor', 'middle');
-                        tooltip.setAttribute('font-size', '12');
-                        tooltip.setAttribute('fill', '#333');
-                        tooltip.setAttribute('font-weight', 'bold');
-                        tooltip.setAttribute('pointer-events', 'none');
-                        tooltip.textContent = Math.round(val * 10) / 10;
-                        tooltip.id = 'tooltip-' + i;
-                        svg.appendChild(tooltip);
+
+                    const rect = svgEl('rect', {
+                        x: x, y: y, width: barWidth, height: barHeight, fill: '#85B7EB', rx: '2'
                     });
-                    
+                    svg.appendChild(rect);
+
+                    rect.addEventListener('mouseover', () => {
+                        rect.setAttribute('fill', '#378ADD');
+                        showTooltip(x + barWidth / 2, y, val, 'tooltip-' + i);
+                    });
                     rect.addEventListener('mouseout', () => {
                         rect.setAttribute('fill', '#85B7EB');
-                        const tooltip = document.getElementById('tooltip-' + i);
-                        if (tooltip) tooltip.remove();
+                        const t = document.getElementById('tooltip-' + i);
+                        if (t) t.remove();
                     });
                 }
             }
+        }
+
+        function drawCompletions() {
+            const wrap = document.getElementById('completions');
+            const max = Math.max(...completions.map(c => c.count));
+            wrap.innerHTML = completions.map(c => `
+                <div class="bar-row">
+                    <div class="bar-label">${c.name}</div>
+                    <div class="bar-track"><div class="bar-fill" style="width:${(c.count / max * 100).toFixed(1)}%"></div></div>
+                    <div class="bar-value">${c.count}</div>
+                </div>
+            `).join('');
         }
 
         document.getElementById('metricSelect').addEventListener('change', (e) => {
@@ -414,6 +406,7 @@
         });
 
         drawChart();
+        drawCompletions();
     </script>
 </body>
 </html>
